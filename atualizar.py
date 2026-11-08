@@ -15,7 +15,25 @@ CSV_URL = (
     "2PACX-1vTPY7EOX1AxoCUlreVUJ25s0xBoaa6sRqKveGebbJxHfYTEAySN7U91ISElmQQGZLXd-k5YTBjDLbtR"
     "/pub?gid=67253354&single=true&output=csv"
 )
+# Endereco direto da planilha (atualiza em segundos). Usado primeiro; se falhar, usa o link publicado acima.
+CSV_DIRETO = (
+    "https://docs.google.com/spreadsheets/d/1JtPUkVYo1gqtQYi0di5bhJW-mr3Lc6cIbfrG8Wpl3zU"
+    "/gviz/tq?tqx=out:csv&gid=67253354"
+)
 SAIDA = "produtos.json"
+
+
+def baixar_csv():
+    for url in (CSV_DIRETO, CSV_URL):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "vitrine-atualizador"})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                texto = r.read().decode("utf-8")
+            if not texto.lstrip().lower().startswith(("<!doctype", "<html")):
+                return texto
+        except Exception as e:
+            print(f"Falhou em {url[:60]}...: {e}")
+    sys.exit("Nao foi possivel ler a planilha por nenhum dos links.")
 
 
 def url_segura(u):
@@ -24,12 +42,7 @@ def url_segura(u):
 
 
 def main():
-    req = urllib.request.Request(CSV_URL, headers={"User-Agent": "vitrine-atualizador"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        texto = r.read().decode("utf-8")
-
-    if texto.lstrip().lower().startswith(("<!doctype", "<html")):
-        sys.exit("A planilha devolveu uma pagina HTML em vez de CSV. Confira se ela esta publicada na web.")
+    texto = baixar_csv()
 
     linhas = [l for l in csv.reader(io.StringIO(texto)) if any(c.strip() for c in l)]
     produtos = []
