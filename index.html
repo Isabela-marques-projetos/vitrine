@@ -17,7 +17,14 @@
     overflow-x: hidden; overflow-y: auto;
   }
   .wrap { max-width: 900px; margin: 0 auto; }
-
+  
+  .titulo-vitrine {
+    text-align: center;
+    color: #222;
+    font-size: clamp(20px, 3vw, 28px);
+    margin: 10px 0 25px;
+    font-weight: bold;
+}
   #grid {
     display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(8px, 1.8vw, 18px);
@@ -71,6 +78,7 @@
 </head>
 <body>
 <div class="wrap">
+  <h1 class="titulo-vitrine">Minha Vitrine de Produtos</h1>
   <div id="grid"></div>
   <p id="msg">Carregando produtos…</p>
 </div>
